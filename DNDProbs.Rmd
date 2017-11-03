@@ -1,0 +1,54 @@
+---
+title: "DnD Probs"
+author: "Carmen"
+date: "11/3/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## DND Probs
+In DND, players roll a 20 sided dice to determine if their actions are successful. The number they roll is contested by a difficulty check. If the player rolls a number higher than the difficulty check, the action is successful. For example, attempting to sneak past a gaurd might call for a player to roll a 15 of higher. DND 5e has a new mechanic that allows players to roll the dice twice, and take the higher of the number. Analysis of the impact of this mechanic follows:\
+\
+
+```{r data, echo = FALSE}
+combinations <- expand.grid(1:20,1:20)
+combinations$disadvantage <- pmin(combinations$Var1,combinations$Var2)
+combinations$advantage <- pmax(combinations$Var1,combinations$Var2)
+
+cumulative_disadv <- seq(1:20)
+cumulative_adv <- seq(1:20)
+cumulative_norm <- seq(from = 1, to = .05, by=-.05)
+
+for (i in 20:1){
+  cumulative_disadv[i] <-  sum(combinations$disadvantage >= i) / NROW(combinations);
+  cumulative_adv[i] <-  sum(combinations$advantage >= i) / NROW(combinations);
+}
+
+roll <- seq(1:20)
+advantage <- as.data.frame(cbind(roll,cumulative_adv))
+advantage$type <- "Advantage"
+disadvantage <- as.data.frame(cbind(roll,cumulative_disadv))
+disadvantage$type <- "Disadvantage"
+normal <- as.data.frame(cbind(roll,cumulative_norm))
+normal$type <- "Normal"
+
+names(disadvantage) <- c("Result","Prob","Type")
+names(advantage) <- c("Result","Prob","Type")
+names(normal) <- c("Result","Prob","Type")
+final <- rbind(disadvantage,normal,advantage)
+rm(list=setdiff(ls(),'final'))
+```
+
+
+```{r plot, echo = FALSE}
+library(ggplot2)
+gg <- ggplot(final, aes(x=Result, y=Prob, group=Type, color=Type))
+gg <- gg + geom_line() + geom_point()
+gg <- gg + labs(title="D&D 5e Advantage and Disadvantage Rolls")
+gg <- gg + theme_bw()
+gg <- gg + theme(legend.position=c(0.1, 0.2))
+gg + ylab("Probablity of Rolling this Number or Higher") + xlab("Difficulty Check")
+```
