@@ -3,8 +3,7 @@ title: "DnD Probs"
 author: "Carmen"
 date: "11/3/2017"
 output:
-  word_document: default
-  html_document: default
+  rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
