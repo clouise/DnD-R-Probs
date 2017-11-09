@@ -4,7 +4,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 library(gridExtra)
 ```
 
@@ -76,8 +76,9 @@ encounter$v5 <- encounter[,4]*encounter[,5]
 success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 3]), numeric(1))
 adv_success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 6]), numeric(1))
 
-ggplot() + 
+g <- ggplot() + 
   geom_line(aes(seq_along(success)-1,success, color="red"), data.frame(success),size=1) +
   geom_line(aes(seq_along(adv_success)-1,adv_success, colour="blue"), data.frame(adv_success),size=1) +
   scale_color_discrete(name = "Probablity Of Success", labels = c("Advantage", "Non-Advantage")) + theme(legend.position=c(0.8, 0.1))
+g
 ```

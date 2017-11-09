@@ -6,12 +6,76 @@ In DND, players roll a 20 sided dice to determine if their actions are successfu
 
 #### Probablity of Dice Rolls
 
+``` r
+uni <- rep(.05,20)
+norm <- ggplot(data.frame(uni),aes(x=seq_along(uni),y=uni)) + geom_bar(stat="identity") + 
+  ylab("Probability of Roll") + xlab("Dice Roll") + ylim(c(0,.45)) + ggtitle("Probablity of Normal Dice Roll")
+
+advantage <- seq(1:20)
+for (i in 1:20){
+  advantage[i] <- ((2*i-1)/20^2)
+}
+adv <- ggplot(data.frame(advantage),aes(x=seq_along(advantage),y=advantage)) + geom_bar(stat="identity") + 
+  ylab("Probability of Roll") + xlab("Dice Roll") + ylim(c(0,.45)) + ggtitle("Probablity of Dice Roll with Advantage")
+
+disadvantage <- rev(advantage)
+disadv <- ggplot(data.frame(disadvantage),aes(x=seq_along(disadvantage),y=disadvantage)) + geom_bar(stat="identity") + 
+  ylab("Probability of Roll") + xlab("Dice Roll") + ylim(c(0,.45)) + ggtitle("Probablity of Dice Roll with Disadvantage")
+
+grid.arrange(norm, adv, disadv, ncol=3)
+```
+
 ![](DNDProbs_files/figure-markdown_github-ascii_identifiers/Dice_Distros-1.png)
 
 Sometimes, you aren't rolling against a single number to determine if you are successful, but many numbers. In the case of a rogue sneaking past many guards, the rogue will roll a dice vs every single guards roll. /n We know the probablity of a player rolling a certain numbers, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15
 
+``` r
+num_guards <- 5
+prob5 <- seq(1:20)
+for (n in 1:20){
+  prob5[n] <- (n^num_guards-(n-1)^num_guards)/20^num_guards
+}
+five <- ggplot(data.frame(prob5),aes(seq_along(prob5),prob5)) + geom_bar(stat="identity") +
+  ylab("Probability of Gaurd Roll") + xlab("Highest Dice Roll") + ggtitle("Probablity of Dice Roll Given 5 Guards") + ylim(c(0,.6))
+
+num_guards <- 10
+prob10 <- seq(1:20)
+for (n in 1:20){
+  prob10[n] <- (n^num_guards-(n-1)^num_guards)/20^num_guards
+}
+ten <- ggplot(data.frame(prob10),aes(seq_along(prob10),prob10)) + geom_bar(stat="identity") +
+  ylab("Probability of Gaurd Roll") + xlab("Highest Dice Roll") + ggtitle("Probablity of Dice Roll Given 10 Guards") + ylim(c(0,.6))
+
+num_guards <- 15
+prob20 <- seq(1:20)
+for (n in 1:20){
+  prob20[n] <- (n^num_guards-(n-1)^num_guards)/20^num_guards
+}
+twenty <- ggplot(data.frame(prob20),aes(seq_along(prob20),prob20)) + geom_bar(stat="identity") +
+  ylab("Probability of Gaurd Roll") + xlab("Highest Dice Roll") + ggtitle("Probablity of Dice Roll Given 20 Guards") + ylim(c(0,.6))
+
+grid.arrange(five, ten, twenty, ncol=3)
+```
+
 ![](DNDProbs_files/figure-markdown_github-ascii_identifiers/guards-1.png)
 
 We have the probabilities of the player rolling certain values, and the probabilities of the guards rolling certain values. We need one more piece of information. Each character has a modifier to the rolls they make. We don't need to know each modifier, but we do need to know how much better the rogue is at sneaking than they guards are at perception. The graph below shows the rogue's probability of success for every relative difference in the difference between the guard and the rogue's modifiers.
+
+``` r
+encounter <- expand.grid(1:20, 1:20)
+encounter <- cbind(encounter, prob = rep(prob5, 20)*.05)
+encounter <- cbind(encounter, base = rep(prob5, 20))
+encounter <- arrange(encounter, Var1)
+encounter <- cbind(encounter, adv = rep(advantage, 20))
+encounter$v5 <- encounter[,4]*encounter[,5]
+success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 3]), numeric(1))
+adv_success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 6]), numeric(1))
+
+g <- ggplot() + 
+  geom_line(aes(seq_along(success)-1,success, color="red"), data.frame(success),size=1) +
+  geom_line(aes(seq_along(adv_success)-1,adv_success, colour="blue"), data.frame(adv_success),size=1) +
+  scale_color_discrete(name = "Probablity Of Success", labels = c("Advantage", "Non-Advantage")) + theme(legend.position=c(0.8, 0.1))
+g
+```
 
 ![](DNDProbs_files/figure-markdown_github-ascii_identifiers/success-1.png)
