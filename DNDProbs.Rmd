@@ -11,11 +11,11 @@ library(gridExtra)
 ## DND Probs
 In DND, players roll a 20 sided dice to determine if their actions are successful. The number they roll is contested by a difficulty check. If the player rolls a number higher than the difficulty check, the action is successful. For example, attempting to sneak past a guard might call for a player to roll a 15 or higher.
 
-Within the newest edition of DnD, there is a mechanic called advantage and disadvantage. They let the player roll the dice two times and take either the higher or the lower of the two numbers as their roll, respectively.
+Within the newest edition of DND, there is a mechanic called advantage and disadvantage. They let the player roll the dice two times and take either the higher or the lower of the two numbers as their roll, respectively.
 
 Below we see the probability distributions for rolling a certain number given a roll with advantage, disadvantage, or under normal circumstances.
 
-#### Probablity of Dice Rolls
+#### Probability of Player Dice Rolls
 ```{r Dice_Distros, fig.width=12, fig.height=4}
 uni <- rep(.05,20)
 norm <- ggplot(data.frame(uni),aes(x=seq_along(uni),y=uni)) + geom_bar(stat="identity") + 
@@ -34,10 +34,12 @@ disadv <- ggplot(data.frame(disadvantage),aes(x=seq_along(disadvantage),y=disadv
 
 grid.arrange(norm, adv, disadv, ncol=3)
 ```
+The above graphs show an even probability for a normal dice roll- each side of the dice has a 5% chance of being rolled. We can see with advantage the probabilities slightly shift and the player has a better chance of rolling higher numbers. Similarly, disadvantage gives the player a slightly higher chance of rolling lower numbers.
 
-Sometimes, you aren't rolling against a single number to determine if you are successful, but many numbers. In the case of a rogue sneaking past many guards, the rogue will roll a dice vs every single guards roll.
+#### Probability of NPC Dice Rolls
+Sometimes, you aren't rolling against a single number to determine if you are successful, but many numbers. In the case of a rogue sneaking past many guards, the rogue will roll a dice vs every single guards' roll.
 
-We know the probability of a player rolling a certain numbers, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15.
+We know the probability of a player rolling a certain numbers, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15 guards.
 
 ``` {r guards, fig.width=12, fig.height=4}
 num_guards <- 5
@@ -66,8 +68,10 @@ twenty <- ggplot(data.frame(prob20),aes(seq_along(prob20),prob20)) + geom_bar(st
 
 grid.arrange(five, ten, twenty, ncol=3)
 ```
+Given 5 guards, the probability of one of them rolling a 20 is around 22%, with 20 guards that probability goes up to around 53%- the more guards there are, the more chances there are of one of them rolling a 20.
 
-We have the probabilities of the player rolling certain values, and the probabilities of the guards rolling certain values. We need one more piece of information. Each character has a modifier to the rolls they make. We don't need to know each modifier, but we do need to know how much better the rogue is at sneaking than they guards are at perception. The graph below shows the rogue's probability of success for every relative difference in the difference between the guard and the rogue's modifiers.
+#### Probability of Success
+We have the probabilities of the player rolling certain values, and the probabilities of the guards rolling certain values. We need one more piece of information. Each character has a modifier to the rolls they make. This represents how good the character is at the activity they are doing- a rogue might have a high mofidier for stealth but a low modifier for strength. We don't need to know the guards' and rogue's indifivual modifiers, but we do need to know how much better the rogue is at sneaking than the guards are at perception. The graph below shows the rogue's probability of success for every relative difference between the 5 guards' and the rogue's modifiers.
 
 ``` {r success, fig.width=6, fig.height=4}
 encounter <- expand.grid(1:20, 1:20)
@@ -75,13 +79,18 @@ encounter <- cbind(encounter, prob = rep(prob5, 20)*.05)
 encounter <- cbind(encounter, base = rep(prob5, 20))
 encounter <- arrange(encounter, Var1)
 encounter <- cbind(encounter, adv = rep(advantage, 20))
-encounter$v5 <- encounter[,4]*encounter[,5]
-success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 3]), numeric(1))
-adv_success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 6]), numeric(1))
+encounter <- cbind(encounter, disadv = rep(disadvantage, 20))
+encounter$adv_prob <- encounter[,4]*encounter[,5]
+encounter$disadv_prob <- encounter[,4]*encounter[,6]
+success <- vapply(0:20, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 3]), numeric(1))
+adv_success <- vapply(0:20, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 7]), numeric(1))
+disadv_success <- vapply(0:20, function(x) sum(encounter[encounter[,1] < (encounter[,2] + x), 8]), numeric(1))
 
 g <- ggplot() + 
-  geom_line(aes(seq_along(success)-1,success, color="red"), data.frame(success),size=1) +
-  geom_line(aes(seq_along(adv_success)-1,adv_success, colour="blue"), data.frame(adv_success),size=1) +
-  scale_color_discrete(name = "Probablity Of Success", labels = c("Advantage", "Non-Advantage")) + theme(legend.position=c(0.8, 0.1)) + xlab("Relative Modifier Difference") +ylab("Probablity of Success")
+  geom_line(aes(seq_along(success)-1,success, color="Normal"), data.frame(success),size=1) +
+  geom_line(aes(seq_along(adv_success)-1,adv_success, colour="Advantage"), data.frame(adv_success),size=1) +
+  geom_line(aes(seq_along(disadv_success)-1,disadv_success, colour="Disadvantage"), data.frame(disadv_success),size=1) +
+  scale_color_discrete(name = "Probablity Of Success") + theme(legend.position=c(0.8, 0.2)) + xlab("Relative Modifier Difference") +ylab("Probablity of Success") + ggtitle("Probability of Success Given 5 Guards")
 g
 ```
+The graph above shows that if a player has a modifier of 10  more stealth than the guards have perception, the rogue has a 60% chance of sneaking by 5 guards, and that is under normal rolls- with advantage that probability goes up to 80%. Even if we increase the number of guards to a theoritcal infinity, the rogue has a 50% chance of being successful. Pass without a trace is a level 2 spell that gives +10 to stealth for the duration.
