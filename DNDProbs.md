@@ -2,7 +2,11 @@
 DND Probs
 ---------
 
-In DND, players roll a 20 sided dice to determine if their actions are successful. The number they roll is contested by a difficulty check. If the player rolls a number higher than the difficulty check, the action is successful. For example, attempting to sneak past a guard might call for a player to roll a 15 or higher. /n Within the newest edition of DnD, there is a mechanic called advantage and disadvantage. They let the player roll the dice two times and take either the higher or the lower of the two numbers as their roll, respectively. /n Below we see the probablity distrobutions for rolling a certain number given a roll with advantage, disadvantage, or under normal circumstances.
+In DND, players roll a 20 sided dice to determine if their actions are successful. The number they roll is contested by a difficulty check. If the player rolls a number higher than the difficulty check, the action is successful. For example, attempting to sneak past a guard might call for a player to roll a 15 or higher.
+
+Within the newest edition of DnD, there is a mechanic called advantage and disadvantage. They let the player roll the dice two times and take either the higher or the lower of the two numbers as their roll, respectively.
+
+Below we see the probability distributions for rolling a certain number given a roll with advantage, disadvantage, or under normal circumstances.
 
 #### Probablity of Dice Rolls
 
@@ -27,7 +31,9 @@ grid.arrange(norm, adv, disadv, ncol=3)
 
 ![](DNDProbs_files/figure-markdown_github-ascii_identifiers/Dice_Distros-1.png)
 
-Sometimes, you aren't rolling against a single number to determine if you are successful, but many numbers. In the case of a rogue sneaking past many guards, the rogue will roll a dice vs every single guards roll. /n We know the probablity of a player rolling a certain numbers, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15
+Sometimes, you aren't rolling against a single number to determine if you are successful, but many numbers. In the case of a rogue sneaking past many guards, the rogue will roll a dice vs every single guards roll.
+
+We know the probability of a player rolling a certain numbers, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15.
 
 ``` r
 num_guards <- 5
@@ -74,7 +80,7 @@ adv_success <- vapply(0:30, function(x) sum(encounter[encounter[,1] < (encounter
 g <- ggplot() + 
   geom_line(aes(seq_along(success)-1,success, color="red"), data.frame(success),size=1) +
   geom_line(aes(seq_along(adv_success)-1,adv_success, colour="blue"), data.frame(adv_success),size=1) +
-  scale_color_discrete(name = "Probablity Of Success", labels = c("Advantage", "Non-Advantage")) + theme(legend.position=c(0.8, 0.1))
+  scale_color_discrete(name = "Probablity Of Success", labels = c("Advantage", "Non-Advantage")) + theme(legend.position=c(0.8, 0.1)) + xlab("Relative Modifier Difference") +ylab("Probablity of Success")
 g
 ```
 
