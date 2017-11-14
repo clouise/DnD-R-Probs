@@ -35,7 +35,7 @@ grid.arrange(norm, adv, disadv, ncol=3)
 
 Sometimes, you aren't rolling against a single number to determine if you are successful, but many numbers. In the case of a rogue sneaking past many guards, the rogue will roll a dice vs every single guards' roll.
 
-We know the probability of a player rolling a certain numbers, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15 guards.
+We know the probability of a player rolling a certain number, now we need to determine given N number of guards what is the probability of at least one of the guards rolling a certain number. Below we will show the probabilities for rolling values given 5, 10 and, 15 guards.
 
 ``` r
 num_guards <- 5
