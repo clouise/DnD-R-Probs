@@ -69,7 +69,7 @@ grid.arrange(five, ten, twenty, ncol=3)
 
 #### Probability of Success
 
-We have the probabilities of the player rolling certain values, and the probabilities of the guards rolling certain values. We need one more piece of information. Each character has a modifier to the rolls they make. This represents how good the character is at the activity they are doing- a rogue might have a high mofidier for stealth but a low modifier for strength. We don't need to know the guards' and rogue's indifivual modifiers, but we do need to know how much better the rogue is at sneaking than the guards are at perception. The graph below shows the rogue's probability of success for every relative difference between the 5 guards' and the rogue's modifiers.
+We have the probabilities of the player rolling certain values, and the probabilities of the guards rolling certain values. We need one more piece of information. Each character has a modifier to the rolls they make. This represents how good the character is at the activity they are doing- a rogue might have a high modifier for stealth but a low modifier for strength. We don't need to know the guards' and rogue's individual modifiers, but we do need to know how much better the rogue is at sneaking than the guards are at perception. The graph below shows the rogue's probability of success for every relative difference between the 5 guards' and the rogue's modifiers.
 
 ``` r
 encounter <- expand.grid(1:20, 1:20)
@@ -94,4 +94,4 @@ g
 
 ![](DnDProbs_files/figure-markdown_github/success-1.png)
 
-The graph above shows that if a player has a modifier of 10 more stealth than the guards have perception, the rogue has a 60% chance of sneaking by 5 guards, and that is under normal rolls- with advantage that probability goes up to 80%. Even if we increase the number of guards to a theoritcal infinity, the rogue has a 50% chance of being successful. Pass without a trace is a level 2 spell that gives +10 to stealth for the duration. Given what we know above, pass without a trace grants an incredible benfit to low level parties.
+The graph above shows that if a player has a modifier of 10 more than the guards, the rogue has a 60% chance of sneaking by 5 guards, and that is under normal rolls- with advantage that probability goes up to 80%. Even if we increase the number of guards to a theoretical infinite, the rogue has a 50% chance of being successful. Pass without a trace is a level 2 spell that gives +10 to stealth for the duration. Given what we know above, pass without a trace grants an incredible benefit to low level parties.
